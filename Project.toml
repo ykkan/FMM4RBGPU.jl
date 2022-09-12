@@ -1,0 +1,13 @@
+name = "FMM4RBGPU"
+uuid = "6188f75b-cc19-42af-84de-782f8f05992b"
+authors = ["Yi-Kai Kan <tw.ykkan@gmail.com> and contributors"]
+version = "0.1.0"
+
+[compat]
+julia = "1.8"
+
+[extras]
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+
+[targets]
+test = ["Test"]
