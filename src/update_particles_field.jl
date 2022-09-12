@@ -1,3 +1,7 @@
+export BruteForce
+export FMM
+export update_particles_field!
+
 import Base.@kwdef
 
 struct BruteForce end
