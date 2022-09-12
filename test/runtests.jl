@@ -6,3 +6,4 @@ using StaticArrays
 include("test_particles.jl")
 include("test_utils/test_utils.jl")
 include("test_cluster_tree/test_cluster_tree.jl")
+include("test_fmm/test_fmm.jl")
