@@ -1,6 +1,6 @@
 using FMM4RBGPU
 using Test
+using LinearAlgebra
+using StaticArrays
 
-@testset "FMM4RBGPU.jl" begin
-    # Write your tests here.
-end
+include("test_particles.jl")

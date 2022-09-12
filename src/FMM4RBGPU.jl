@@ -1,5 +1,9 @@
 module FMM4RBGPU
+using LinearAlgebra
+using StaticArrays
 
-# Write your package code here.
+export Particles, Beam
+
+include("particles.jl")
 
 end
