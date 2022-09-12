@@ -7,5 +7,6 @@ export Particles, Beam
 include("particles.jl")
 include("utils/utils.jl")
 include("cluster_tree/cluster_tree.jl")
+include("fmm/fmm.jl")
 
 end

@@ -1,7 +1,7 @@
 include("clusters.jl")
 include("treeinfo.jl")
 
-export CusterTree
+export ClusterTree
 
 struct ClusterTree{I<:Integer,T}
     particles::Particles{T}
