@@ -1,34 +1,18 @@
 export P2M!, M2M!, upwardpass!
 # values of Lagragian polynomials on chevyschev point evaluated at x
+
 function lgweight(x::T, nodes::Vector{T}) where {T}
     n = length(nodes) - 1
-    w = [(-1.0)^(j) for j in 0:n]
-    w[1] = 0.5
-    w[n + 1] = 0.5 * w[n + 1]
-    diffs = x .- nodes
-    flag = findfirst(x->abs(x) < eps(T), diffs)
-    values = zeros(n+1)
-    if flag == nothing
-        values .= w ./ diffs
-        sum_v = sum(values)
-        return values ./ sum_v
-    else
-        values[flag] = 1.0
-        return values
+    bitarr = abs.((x .- nodes)) .< eps(T)
+    if any(bitarr)
+        return convert.(Float64, bitarr)
     end
+    ws = [(-1.0)^(j%2) for j in 0:n]
+    ws[1] = 0.5
+    ws[n + 1] = 0.5 * ws[n + 1]
+    values = ws ./ (x .- nodes)
+    return values ./ sum(values)
 end
-
-function lgweight(x::T, idx::I, nodes::Vector{T}, n::I) where {I,T}
-    values = zeros(n+1)
-    epsi = eps(T)
-    values[1] = 0.5 / (abs(x - nodes[1]) + epsi)
-    for i in 1:(n-1)
-        values[i+1] = (-1.0)^(i%2)/(abs(x - nodes[i+1]) + epsi)
-    end
-    values[n+1] = 0.5*(-1.0)^(n%2) / (abs(x - nodes[n+1]) + epsi)
-    return values[idx] / sum(values)
-end
-
 
 function P2M!(mp::MacroParticles{I,T}, lfindices::UnitRange{I}, ct::ClusterTree{I,T}) where {I,T}
     particles = ct.particles
@@ -37,9 +21,9 @@ function P2M!(mp::MacroParticles{I,T}, lfindices::UnitRange{I}, ct::ClusterTree{
 
     for nodeindex in lfindices
         lo, hi = parlohis[nodeindex]
-        mpxcoords = mp.xcoords[:,nodeindex]
-        mpycoords = mp.ycoords[:,nodeindex]
-        mpzcoords = mp.zcoords[:,nodeindex]
+        mp_xcoords = mp.xcoords[:,nodeindex]
+        mp_ycoords = mp.ycoords[:,nodeindex]
+        mp_zcoords = mp.zcoords[:,nodeindex]
         for p = lo:hi
             pindex = parindices[p]
             pos = particles.positions[pindex]
@@ -47,18 +31,15 @@ function P2M!(mp::MacroParticles{I,T}, lfindices::UnitRange{I}, ct::ClusterTree{
             ga = sqrt(1.0 + dot(mom,mom))
 
             x, y, z = pos
-            # deposite to macro paritcles
-            weights_x = lgweight(x, mp.xcoords[:,nodeindex])
-            weights_y = lgweight(y, mp.ycoords[:,nodeindex])
-            weights_z = lgweight(z, mp.zcoords[:,nodeindex])
             n = mp.n
+            #deposite to macro paritcles
+            weights_x = lgweight(x, mp_xcoords)
+            weights_y = lgweight(y, mp_ycoords)
+            weights_z = lgweight(z, mp_zcoords)
             for k in 1:(n + 1)
-                wz = lgweight(z, k, mpxcoords, n)
                 for j in 1:(n + 1)
-                    wy = lgweight(y, j, mpycoords, n)
                     for i in 1:(n + 1)
-                        wx = lgweight(x, i, mpxcoords, n)
-                        weight = wx * wy * wz
+                        weight = weights_x[i] * weights_y[j] * weights_z[k]
                         mp.gammas[i,j,k,nodeindex] += ga * weight
                         mp.momenta[i,j,k,nodeindex] += mom * weight
                     end
@@ -67,6 +48,8 @@ function P2M!(mp::MacroParticles{I,T}, lfindices::UnitRange{I}, ct::ClusterTree{
         end
     end
 end
+
+
 
 function M2M!(mp::MacroParticles{I,T}, nodeindices::UnitRange{I}, ct::ClusterTree{I,T}) where {I,T}
     n = mp.n
@@ -83,21 +66,23 @@ function M2M!(mp::MacroParticles{I,T}, nodeindices::UnitRange{I}, ct::ClusterTre
         p_zcoords = mp.zcoords[:,parent_index]
         p_gammas = @view mp.gammas[:,:,:,parent_index]
         p_momenta = @view mp.momenta[:,:,:,parent_index]
-        for pk in 1:(n+1)
-            for pj in 1:(n+1)
-                for pi in 1:(n+1)
-                    for ck in 1:(n+1)
-                        cz = c_zcoords[ck]
-                        wz = lgweight(cz, pk, p_zcoords, n)
-                        for cj in 1:(n+1)
-                            cy = c_ycoords[cj]
-                            wy = lgweight(cy, pj, p_ycoords, n)
-                            for ci in 1:(n+1)
-                                cx = c_xcoords[ci]
-                                wx = lgweight(cx, pi, p_xcoords, n)
-                                weight = wx * wy * wz
-                                p_gammas[pi,pj,pk] += c_gammas[ci,cj,ck] * weight
-                                p_momenta[pi,pj,pk] += c_momenta[ci,cj,ck] * weight
+        for ck in 1:(n+1)
+            cz = c_zcoords[ck]
+            weights_z = lgweight(cz, p_zcoords)
+            for cj in 1:(n+1)
+                cy = c_ycoords[cj]
+                weights_y = lgweight(cy, p_ycoords)
+                for ci in 1:(n+1)
+                    cx = c_xcoords[ci]
+                    weights_x = lgweight(cx, p_xcoords)
+                    c_ga = c_gammas[ci,cj,ck]
+                    c_mom = c_momenta[ci,cj,ck]
+                    for pk in 1:(n+1)
+                        for pj in 1:(n+1)
+                            for pi in 1:(n+1)
+                                weight = weights_x[pi]*weights_y[pj]*weights_z[pk]
+                                p_gammas[pi,pj,pk] += c_ga * weight
+                                p_momenta[pi,pj,pk] += c_mom * weight
                             end
                         end
                     end
