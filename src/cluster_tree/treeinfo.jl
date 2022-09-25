@@ -12,6 +12,10 @@ function ncluster(N::I, N0::I) where {I}
     return 2^(ml+1)-1
 end
 
+function ncluster(ml::I) where {I}
+    return 2^(ml+1)-1
+end
+
 function nodeindexrangeat(l)
     return (2^l):(2^(l+1)-1)
 end
