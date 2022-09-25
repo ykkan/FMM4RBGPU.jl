@@ -1,7 +1,7 @@
 export P2M!, M2M!, upwardpass!
 # values of Lagragian polynomials on chevyschev point evaluated at x
 
-function lgweight(x::T, nodes::SVector{T}) where {T}
+function lgweight(x::T, nodes::Vector{T}) where {T}
     n = length(nodes) - 1
     bitarr = abs.((x .- nodes)) .< eps(T)
     if any(bitarr)
