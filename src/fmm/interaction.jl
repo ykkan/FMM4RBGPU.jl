@@ -1,18 +1,22 @@
 export M2L!, P2P!, interact!
 
-function M2L!(mp::MacroParticles{I,T}, m2l_lists::Vector{Tuple{I,I}}, nm2l::I; p_avg::SVector{3,T}) where {I,T}
+function M2L!(mp::MacroParticles{I,T}, ct::ClusterTree{I,T}, m2l_lists::Vector{Tuple{I,I}}, nm2l::I; p_avg::SVector{3,T}) where {I,T}
     n = mp.n
+    bboxes = ct.clusters.bboxes
     for i in 1:nm2l
         tindex, sindex = m2l_lists[i]
-        s_xcoords = @view mp.xcoords[:,sindex]
-        s_ycoords = @view mp.ycoords[:,sindex]
-        s_zcoords = @view mp.zcoords[:,sindex]
+
+        s_bmin, s_bmax = bboxes[sindex]
+        s_xcoords = cheb2(n, s_bmin[1], s_bmax[1])
+        s_ycoords = cheb2(n, s_bmin[2], s_bmax[2])
+        s_zcoords = cheb2(n, s_bmin[3], s_bmax[3])
         s_gammas = @view mp.gammas[:,:,:,sindex]
         s_momenta = @view mp.momenta[:,:,:,sindex]
 
-        t_xcoords = @view mp.xcoords[:,tindex]
-        t_ycoords = @view mp.ycoords[:,tindex]
-        t_zcoords = @view mp.zcoords[:,tindex]
+        t_bmin, t_bmax = bboxes[tindex]
+        t_xcoords = cheb2(n, t_bmin[1], t_bmax[1])
+        t_ycoords = cheb2(n, t_bmin[2], t_bmax[2])
+        t_zcoords = cheb2(n, t_bmin[3], t_bmax[3])
         t_efields = @view mp.efields[:,:,:,tindex]
         t_bfields = @view mp.bfields[:,:,:,tindex]
 
@@ -71,6 +75,6 @@ function P2P!(particles::Particles{T}, parindices::Vector{Int}, clusters::Cluste
 end
 
 function interact!(mp::MacroParticles{I,T}, ct::ClusterTree{I,T}, itlists::InteractionLists{I}; p_avg) where {I,T}
-    M2L!(mp, itlists.m2l_lists, itlists.nm2l; p_avg=p_avg)
+    M2L!(mp, ct, itlists.m2l_lists, itlists.nm2l; p_avg=p_avg)
     P2P!(ct.particles, ct.parindices, ct.clusters, itlists.p2p_lists, itlists.np2p)
 end
