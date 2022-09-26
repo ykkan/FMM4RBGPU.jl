@@ -9,6 +9,7 @@
         bbox2 = BBox(SVector(-1.0,-1.0,-1.0+distance),SVector(1.0,1.0,1.0+distance))
         clusters.bboxes[1] = bbox1
         clusters.bboxes[2] = bbox2
+        ct = ClusterTree(Particles(;pos=zeros(3,5),mom=zeros(3,5)), [1:5;], clusters)
 
         mp = MacroParticles(clusters, n)
         mp.gammas[:,:,:,1] .= 1.0
@@ -16,7 +17,7 @@
         m2l_lists = [(1,2), (2,1)]
         nm2l = 2
         p_avg = SVector(0.0,0.0,0.0)
-        M2L!(mp, m2l_lists, nm2l; p_avg=p_avg)
+        M2L!(mp, ct, m2l_lists, nm2l; p_avg=p_avg)
         yy = SVector(0.0,0.0,0.0)
         xx = SVector(0.0,0.0,distance)
         far_efield = (n+1)^3 * (xx - yy) / norm(xx-yy)^3

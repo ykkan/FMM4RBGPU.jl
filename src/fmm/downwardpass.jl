@@ -2,17 +2,20 @@ export L2L!, L2P!, downwardpass!
 
 function L2L!(mp::MacroParticles{I,T}, nodeindices::UnitRange{I}, ct::ClusterTree{I,T}) where {I,T}
     n = mp.n
+    bboxes = ct.clusters.bboxes
     for nodeindex in nodeindices
-        c_xcoords = @view mp.xcoords[:,nodeindex]
-        c_ycoords = @view mp.ycoords[:,nodeindex]
-        c_zcoords = @view mp.zcoords[:,nodeindex]
+        c_bmin, c_bmax = bboxes[nodeindex]
+        c_xcoords = cheb2(n, c_bmin[1], c_bmax[1])
+        c_ycoords = cheb2(n, c_bmin[2], c_bmax[2])
+        c_zcoords = cheb2(n, c_bmin[3], c_bmax[3])
         c_efields = @view mp.efields[:,:,:,nodeindex]
         c_bfields = @view mp.bfields[:,:,:,nodeindex]
 
         parent_index = ct.clusters.parents[nodeindex]
-        p_xcoords = mp.xcoords[:,parent_index]
-        p_ycoords = mp.ycoords[:,parent_index]
-        p_zcoords = mp.zcoords[:,parent_index]
+        p_bmin, p_bmax = bboxes[parent_index]
+        p_xcoords = cheb2(n, p_bmin[1], p_bmax[1])
+        p_ycoords = cheb2(n, p_bmin[2], p_bmax[2])
+        p_zcoords = cheb2(n, p_bmin[3], p_bmax[3])
         p_efields = @view mp.efields[:,:,:,parent_index]
         p_bfields = @view mp.bfields[:,:,:,parent_index]
 
@@ -46,20 +49,22 @@ function L2P!(mp::MacroParticles{I,T}, lfindices::UnitRange{I}, ct::ClusterTree{
     particles = ct.particles
     parindices = ct.parindices
     parlohis = ct.clusters.parlohis
+    bboxes = ct.clusters.bboxes
 
     efields = particles.efields
     bfields = particles.bfields
     for nodeindex in lfindices
         lo, hi = parlohis[nodeindex]
-        p_xcoords = mp.xcoords[:,nodeindex]
-        p_ycoords = mp.ycoords[:,nodeindex]
-        p_zcoords = mp.zcoords[:,nodeindex]
+        bmin, bmax = bboxes[nodeindex]
+        mp_xcoords = cheb2(n, bmin[1], bmax[1])
+        mp_ycoords = cheb2(n, bmin[2], bmax[2])
+        mp_zcoords = cheb2(n, bmin[3], bmax[3])
         for p = lo:hi
             parindex = parindices[p]
             x,y,z = particles.positions[parindex]
-            weights_x = lgweight(x, p_xcoords)
-            weights_y = lgweight(y, p_ycoords)
-            weights_z = lgweight(z, p_zcoords)
+            weights_x = lgweight(x, mp_xcoords)
+            weights_y = lgweight(y, mp_ycoords)
+            weights_z = lgweight(z, mp_zcoords)
 
             for k in 1:(n + 1)
                 for j in 1:(n + 1)

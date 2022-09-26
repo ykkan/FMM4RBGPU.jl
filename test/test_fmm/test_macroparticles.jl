@@ -13,11 +13,7 @@
 
         n = 3
         mp = MacroParticles(clusters, n)
-        xc = mp.xcoords[:,1]
-        yc = mp.ycoords[:,1]
-        zc = mp.zcoords[:,1]
-        @test xc[1] > 0
-        @test xc[n+1] < 1
         @test size(mp.gammas[:,:,:,4]) == (n+1,n+1,n+1)
+        @test size(mp.momenta[:,:,:,4]) == (n+1,n+1,n+1)
     end
 end
