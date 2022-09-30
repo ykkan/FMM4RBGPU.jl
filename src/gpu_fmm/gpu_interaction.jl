@@ -39,7 +39,7 @@ function gpu_M2L!(mp_gammas::CuDeviceArray{T,4,1}, mp_momenta::CuDeviceArray{SVe
 end
 
 function gpu_P2P!(pr_positions::CuDeviceVector{SVector{3,T},1}, pr_momenta::CuDeviceVector{SVector{3,T},1}, pr_efields::CuDeviceVector{SVector{3,T},1}, pr_bfields::CuDeviceVector{SVector{3,T},1}, ct_parindices::CuDeviceVector{I,1},
-    cl_parlohis::CuDeviceVector{Tuple{I,I},1}, p2p_lists::CuDeviceVector{Tuple{I,I},1}) where {I,T}
+    cl_parlohis::CuDeviceVector{Tuple{I,I},1}, VN0::Val{N0}, p2p_lists::CuDeviceVector{Tuple{I,I},1}) where {I,T,N0}
     bid = blockIdx().x
     block_size = blockDim().x
     tid = threadIdx().x
@@ -47,30 +47,31 @@ function gpu_P2P!(pr_positions::CuDeviceVector{SVector{3,T},1}, pr_momenta::CuDe
 
     t_parlo, t_parhi = cl_parlohis[tindex]
     s_parlo, s_parhi = cl_parlohis[sindex]
-    shared_s_positions = CuDynamicSharedArray(SVector{3,T}, block_size)
-    shared_s_momenta = CuDynamicSharedArray(SVector{3,T}, block_size)
+    shared_s_positions = CuStaticSharedArray(SVector{3,T}, N0)
+    shared_s_momenta = CuStaticSharedArray(SVector{3,T}, N0)
 
 
-    s_npar = s_parhi - s_parlo +1
     t_npar = t_parhi - t_parlo +1
+    s_npar = s_parhi - s_parlo +1
 
     if tid <= s_npar
         j = ct_parindices[tid + s_parlo - 1]
         shared_s_positions[tid] = pr_positions[j]
         shared_s_momenta[tid] = pr_momenta[j]
+        # @cuprintln(bid, " ", tid," ", pr_positions[j][1], " ", pr_positions[j][2], " ", pr_positions[j][3], " ", shared_s_positions[tid][1]," ",shared_s_positions[tid][2]," ",shared_s_positions[tid][3])
     end
     sync_threads()
 
     if tid <= t_npar
         t_e_sum = SVector{3,T}(0.0,0.0,0.0)
         t_b_sum = SVector{3,T}(0.0,0.0,0.0)
-        i = ct_parindices[tid + s_parlo - 1]
+        i = ct_parindices[tid + t_parlo - 1]
         xi = pr_positions[i]
         for s_j in 1:s_npar
             xj = shared_s_positions[s_j]
             pj = shared_s_momenta[s_j]
             gj = sqrt(1.0 + dot(pj,pj))
-            R = xi-xj
+            R = xi - xj
             Kij = R / sqrt(dot(R, R) + dot(pj, R)^2 + eps())^3
             t_e_sum += gj * Kij
             t_b_sum += cross(pj, Kij)

@@ -48,15 +48,15 @@
         separation=10000.0
         pos = rand(3, npar)
         mom = zeros(3, npar)
-        pos[3,101:npar] .+= separation
+        pos[3,1:div(npar,2)] .+= separation
         particles = Particles(;pos=pos, mom=mom)
         parindices = [1:npar;]
 
 
 
         clusters = Clusters(2)
-        clusters.parlohis[1] = (1,100)
-        clusters.parlohis[2] = (101,npar)
+        clusters.parlohis[1] = (1,div(npar,2))
+        clusters.parlohis[2] = ((div(npar,2)+1),npar)
 
         p2p_lists = [(1,2), (2,1)]
         np2p = 2
@@ -72,7 +72,7 @@
 
         d_p2p_lists = CuArray(p2p_lists)
         block_size = 128
-        @cuda blocks=np2p threads=block_size shmem=(block_size*sizeof(SVector{3,Float64})) gpu_P2P!(d_pr_positions, d_pr_momenta, d_pr_efields, d_pr_bfields, d_ct_parindices, d_cl_parlohis, d_p2p_lists)
+        @cuda blocks=np2p threads=block_size shmem=(block_size*sizeof(particles.positions[1])) gpu_P2P!(d_pr_positions, d_pr_momenta, d_pr_efields, d_pr_bfields, d_ct_parindices, d_cl_parlohis, Val(block_size),d_p2p_lists)
 
         copyto!(particles.efields, d_pr_efields)
         copyto!(particles.bfields, d_pr_bfields)
@@ -81,10 +81,10 @@
         xx = SVector(0.0,0.0,separation)
         far_efield = npar/2 * (xx - yy) / norm(xx-yy)^3
         # test field of one particle from cluster 1
-        @test isapprox(particles.efields[1], -1.0 * far_efield; rtol=1e-3)
+        @test isapprox(particles.efields[1], far_efield; rtol=1e-3)
         @test isapprox(particles.bfields[1], SVector(0.0,0.0,0.0); rtol=1e-3)
         # test field of one particle from cluster 2
-        @test isapprox(particles.efields[101], far_efield; rtol=1e-3)
-        @test isapprox(particles.bfields[101], SVector(0.0,0.0,0.0); rtol=1e-3)
+        @test isapprox(particles.efields[npar], (-1)*far_efield; rtol=1e-3)
+        @test isapprox(particles.bfields[npar], SVector(0.0,0.0,0.0); rtol=1e-3)
     end
 end
