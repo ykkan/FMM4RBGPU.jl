@@ -36,6 +36,7 @@ function gpu_M2L!(mp_gammas::CuDeviceArray{T,4,1}, mp_momenta::CuDeviceArray{SVe
         end
         mp_efields[t_i,t_j,t_k,tindex] += t_e_sum
         mp_bfields[t_i,t_j,t_k,tindex] += t_b_sum
+        sync_threads()
     end
     return nothing
 end

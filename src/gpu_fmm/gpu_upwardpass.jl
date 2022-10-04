@@ -170,20 +170,3 @@ function gpu_M2M!(mp_gammas::CuDeviceArray{T,4,1}, mp_momenta::CuDeviceArray{SVe
     mp_momenta[p_i,p_j,p_k,parent_index] += p_mom
     return nothing
 end
-
-# function upwardpass!(mp_xcoords::CuDeviceArray{T,2,1}, mp_ycoords::CuDeviceArray{T,2,1}, mp_zcoords::CuDeviceArray{T,2,1},
-#     mp_gammas::CuDeviceArray{SVector{3,T},2,1}, mp_momenta::CuDeviceArray{SVector{3,T},2,1}, cl_parents::CuDeviceVector{I,1}; max_level::I) where {I,T}
-#     leafindicies = nodeindexrangeat(max_level)
-#     nc = ncluster(max_level)
-#     @cuda blocks=nc threads=(n+1,n+1,n+1) gpu_P2M!(pr_positions, pr_momenta, ct_parindices,
-#     mp_xcoords, mp_ycoords, mp_zcoords, mp_gammas, mp_momenta,
-#     cl_parlohis, leafindicies)
-#     for l in max_level:-1:1
-#         nodeindicies = nodeindexrangeat(l)
-#         nc_in_level = 2^l
-#         @cuda blocks=nc_in_level threads=(n+1,n+1,n+1) M2M!(mp_xcoords, mp_ycoords, mp_zcoords,
-#         mp_gammas, mp_momenta,
-#         cl_parents, nodeindicies)
-#     end
-#     return nothing
-# end
