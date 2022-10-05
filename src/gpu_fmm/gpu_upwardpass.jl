@@ -10,14 +10,14 @@ function gpu_P2M!(pr_positions::CuDeviceVector{SVector{3,T},1}, pr_momenta::CuDe
     lo, hi = cl_parlohis[nodeindex]
     mp_bmin, mp_bmax = cl_bboxes[nodeindex]
 
-    xnodes = @MVector zeros(T,D+1)
-    ynodes = @MVector zeros(T,D+1)
-    znodes = @MVector zeros(T,D+1)
-    for i in 1:(D+1)
-        xnodes[i] = mp_bmin[1] + (cos(pi*(i-1)/D) + 1.0)/2.0 * (mp_bmax[1] - mp_bmin[1])
-        ynodes[i] = mp_bmin[2] + (cos(pi*(i-1)/D) + 1.0)/2.0 * (mp_bmax[2] - mp_bmin[2])
-        znodes[i] = mp_bmin[3] + (cos(pi*(i-1)/D) + 1.0)/2.0 * (mp_bmax[3] - mp_bmin[3])
-    end
+    xnodes = nsvector(i->cheb2coord(i, mp_bmin[1], mp_bmax[1], Val(D)), Val(D+1), T)
+    ynodes = nsvector(i->cheb2coord(i, mp_bmin[2], mp_bmax[2], Val(D)), Val(D+1), T)
+    znodes = nsvector(i->cheb2coord(i, mp_bmin[3], mp_bmax[3], Val(D)), Val(D+1), T)
+    # for i in 1:(D+1)
+    #     xnodes[i] = mp_bmin[1] + (cos(pi*(i-1)/D) + 1.0)/2.0 * (mp_bmax[1] - mp_bmin[1])
+    #     ynodes[i] = mp_bmin[2] + (cos(pi*(i-1)/D) + 1.0)/2.0 * (mp_bmax[2] - mp_bmin[2])
+    #     znodes[i] = mp_bmin[3] + (cos(pi*(i-1)/D) + 1.0)/2.0 * (mp_bmax[3] - mp_bmin[3])
+    # end
 
     mp_i, mp_j, mp_k = tid
     mp_x = xnodes[mp_i]
@@ -26,12 +26,13 @@ function gpu_P2M!(pr_positions::CuDeviceVector{SVector{3,T},1}, pr_momenta::CuDe
 
     mp_ga = zero(T)
     mp_mom = SVector{3,T}(0.0,0.0,0.0)
-    ws = @MVector zeros(T,D+1)
-    for i in 1:(D+1)
-        ws[i] = (i%2)==1 ? 1.0 : -1.0
-    end
-    ws[1] *= 0.5
-    ws[D+1] *= 0.5
+    ws = baryweights(Val(D+1), T)
+    # ws = @MVector zeros(T,D+1)
+    # for i in 1:(D+1)
+    #     ws[i] = (i%2)==1 ? 1.0 : -1.0
+    # end
+    # ws[1] *= 0.5
+    # ws[D+1] *= 0.5
     for p in lo:hi
         pindex = ct_parindices[p]
         x,y,z = pr_positions[pindex]
@@ -92,21 +93,11 @@ function gpu_M2M!(mp_gammas::CuDeviceArray{T,4,1}, mp_momenta::CuDeviceArray{SVe
     child_indicies = cl_children[parent_index]
     p_bmin, p_bmax = cl_bboxes[parent_index]
 
-    ws = @MVector zeros(T,D+1)
-    for i in 1:(D+1)
-        ws[i] = (i%2)==1 ? 1.0 : -1.0
-    end
-    ws[1] *= 0.5
-    ws[D+1] *= 0.5
+    ws = baryweights(Val(D+1), T)
 
-    p_xcoords = @MVector zeros(T,D+1)
-    p_ycoords = @MVector zeros(T,D+1)
-    p_zcoords = @MVector zeros(T,D+1)
-    for i in 1:(D+1)
-        p_xcoords[i] = p_bmin[1] + (cos(pi*(i-1)/D) + 1.0)/2.0 * (p_bmax[1] - p_bmin[1])
-        p_ycoords[i] = p_bmin[2] + (cos(pi*(i-1)/D) + 1.0)/2.0 * (p_bmax[2] - p_bmin[2])
-        p_zcoords[i] = p_bmin[3] + (cos(pi*(i-1)/D) + 1.0)/2.0 * (p_bmax[3] - p_bmin[3])
-    end
+    p_xcoords = nsvector(i->cheb2coord(i, p_bmin[1], p_bmax[1], Val(D)), Val(D+1), T)
+    p_ycoords = nsvector(i->cheb2coord(i, p_bmin[2], p_bmax[2], Val(D)), Val(D+1), T)
+    p_zcoords = nsvector(i->cheb2coord(i, p_bmin[3], p_bmax[3], Val(D)), Val(D+1), T)
 
     p_x = p_xcoords[p_i]
     p_y = p_ycoords[p_j]
