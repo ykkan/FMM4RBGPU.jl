@@ -36,7 +36,6 @@ function gpu_M2L!(mp_gammas::CuDeviceArray{T,4,1}, mp_momenta::CuDeviceArray{SVe
         end
         mp_efields[t_i,t_j,t_k,tindex] += t_e_sum
         mp_bfields[t_i,t_j,t_k,tindex] += t_b_sum
-        sync_threads()
     end
     return nothing
 end
@@ -61,7 +60,6 @@ function gpu_P2P!(pr_positions::CuDeviceVector{SVector{3,T},1}, pr_momenta::CuDe
             j = ct_parindices[tid + s_parlo - 1]
             shared_s_positions[tid] = pr_positions[j]
             shared_s_momenta[tid] = pr_momenta[j]
-            # @cuprintln(bid, " ", tid," ", pr_positions[j][1], " ", pr_positions[j][2], " ", pr_positions[j][3], " ", shared_s_positions[tid][1]," ",shared_s_positions[tid][2]," ",shared_s_positions[tid][3])
         end
         sync_threads()
 
@@ -82,7 +80,6 @@ function gpu_P2P!(pr_positions::CuDeviceVector{SVector{3,T},1}, pr_momenta::CuDe
             pr_efields[i] += t_e_sum
             pr_bfields[i] += t_b_sum
         end
-        sync_threads()
     end
     return nothing
 end
