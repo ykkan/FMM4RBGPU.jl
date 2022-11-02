@@ -80,6 +80,7 @@ function gpu_P2P!(pr_positions::CuDeviceVector{SVector{3,T},1}, pr_momenta::CuDe
             pr_efields[i] += t_e_sum
             pr_bfields[i] += t_b_sum
         end
+        sync_threads()
     end
     return nothing
 end
