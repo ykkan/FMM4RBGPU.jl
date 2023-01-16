@@ -4,13 +4,13 @@
 
 by Yi-Kai Kan (<yikai.kan@desy.de>)
 
-This package provides serial and GPU-parallelized fast mutiple method (FMM) routines for the efficient computation of the space-charge field from the relativistic charged particle beam. The FMM is based on the Lagrangian interpolation and dual-tree traversal. Array-based tree data structure is used to implement the cluster tree. The contruction of this package follows test-driven development (TDD).
+This package provides serial and GPU-parallelized fast mutiple method (FMM) routines for the efficient computation of the space-charge field from the relativistic charged particle beam. The FMM is based on the Lagrangian interpolation and dual-tree traversal. Array-based tree data structure is used to implement the cluster tree.
 
 ## Usage
 ### Creating a Charged Particle Beam
 A charged particle beam can be created by providing an array of particle position and an array of particle momentum.
 ``` julia
-using NChargedBodyTreecode
+using FMM4RBGPU
 
 # number of particles
 const N = 1000    
