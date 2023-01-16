@@ -1,17 +1,10 @@
 # FMM4RBGPU
 
-
-
 [![DOI](https://zenodo.org/badge/535562721.svg)](https://zenodo.org/badge/latestdoi/535562721)
-[![Build Status](https://github.com/ykkan/FMM4RBGPU.jl/actions/workflows/CI.yml/badge.svg?branch=main)](https://github.com/ykkan/FMM4RBGPU.jl/actions/workflows/CI.yml?query=branch%3Amain)
-[![Coverage](https://codecov.io/gh/ykkan/FMM4RBGPU.jl/branch/main/graph/badge.svg)](https://codecov.io/gh/ykkan/FMM4RBGPU.jl)
-
 
 by Yi-Kai Kan (<yikai.kan@desy.de>)
 
 This package provides serial and GPU-parallelized fast mutiple method (FMM) routines for the efficient computation of the space-charge field from the relativistic charged particle beam. The FMM is based on the Lagrangian interpolation and dual-tree traversal. Array-based tree data structure is used to implement the cluster tree. The contruction of this package follows test-driven development (TDD).
-
-__Note__: This repository is not publicly accessible at this moment.
 
 ## Speed
 The elapsed times for the evaluation of space-cahrge field from $2.56\times 10^7$ particles on different hardwares
