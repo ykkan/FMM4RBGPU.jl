@@ -6,6 +6,17 @@ by Yi-Kai Kan (<yikai.kan@desy.de>)
 
 This package provides serial and GPU-parallelized fast mutiple method (FMM) routines for the efficient computation of the space-charge field from the relativistic charged particle beam. The FMM is based on the Lagrangian interpolation and dual-tree traversal. Array-based tree data structure is used to implement the cluster tree.
 
+## Installation
+The package can be installed using Julia's REPL
+```julia
+julia> import Pkg
+julia> Pkg.add(url="https://github.com/ykkan/FMM4RBGPU.jl.git")
+```
+or with Pkg mode (hitting `]` in the command prompt)
+```julia
+pkg> add https://github.com/ykkan/FMM4RBGPU.jl.git
+```
+
 ## Usage
 ### Creating a Charged Particle Beam
 A charged particle beam can be created by providing an array of particle position and an array of particle momentum.
@@ -57,8 +68,10 @@ The elapsed times for the evaluation of space-cahrge field from $2.56\times 10^7
 * GPU Nvidia Telsla A100: 29.1s (x130 speedup)
 
 ## References
-* Y.-K. Kan, F. X. Kärtner, S. Le Borne, and J.-P. M. Zemke, Relativistic Space-Charge Field Calculation by Interpolation-Based Treecode, submitted
-   [https://doi.org/10.48550/arXiv.2206.02833](https://doi.org/10.48550/arXiv.2206.02833)
+* Y.-K. Kan, F. X. Kärtner, S. Le Borne, and J.-P. M. Zemke, Relativistic Space-Charge Field Calculation by Interpolation-Based Treecode, preprint [https://doi.org/10.48550/arXiv.2206.02833](https://doi.org/10.48550/arXiv.2206.02833)
+https://doi.org/10.48550/arXiv.2302.07567
+
+* Y.-K. Kan, F. X. Kärtner, S. Le Borne, J.-P. M. Zemke, Relativistic Space-Charge Field Calculation by Interpolation-Based Treecode, _Comput. Phys. Commun._ __286__ (2023), 108668.
 
 * L. Wilson, N. Vaughn, and R. Krasny, A GPU-accelerated fast 
             multipole method based on barycentric Lagrange interpolation 
