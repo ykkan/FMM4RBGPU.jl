@@ -68,8 +68,7 @@ The elapsed times for the evaluation of space-cahrge field from $2.56\times 10^7
 * GPU Nvidia Telsla A100: 29.1s (x130 speedup)
 
 ## References
-* Y.-K. Kan, F. X. Kärtner, S. Le Borne, and J.-P. M. Zemke, Relativistic Space-Charge Field Calculation by Interpolation-Based Treecode, preprint [https://doi.org/10.48550/arXiv.2206.02833](https://doi.org/10.48550/arXiv.2206.02833)
-https://doi.org/10.48550/arXiv.2302.07567
+* Y.-K. Kan, F. X. Kärtner, S. Le Borne, and J.-P. M. Zemke, A GPU-Parallelized Interpolation-Based Fast Multipole Method for the Relativistic Space-Charge Field Calculation, preprint [https://arxiv.org/abs/2302.07567](https://arxiv.org/abs/2302.07567)
 
 * Y.-K. Kan, F. X. Kärtner, S. Le Borne, J.-P. M. Zemke, Relativistic Space-Charge Field Calculation by Interpolation-Based Treecode, _Comput. Phys. Commun._ __286__ (2023), 108668.
 
