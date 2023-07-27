@@ -2,7 +2,7 @@
 
 [![DOI](https://zenodo.org/badge/535562721.svg)](https://zenodo.org/badge/latestdoi/535562721)
 
-by Yi-Kai Kan (<yikai.kan@desy.de>)
+by Yi-Kai Kan (<tw.ykkan@gmail.com>)
 
 This package provides serial and GPU-parallelized fast mutiple method (FMM) routines for the efficient computation of the space-charge field from the relativistic charged particle beam. The FMM is based on the Lagrangian interpolation and dual-tree traversal. Array-based tree data structure is used to implement the cluster tree.
 
@@ -68,15 +68,6 @@ The elapsed times for the evaluation of space-cahrge field from $2.56\times 10^7
 * GPU Nvidia Telsla A100: 29.1s (x130 speedup)
 
 ## References
-* Y.-K. Kan, F. X. Kärtner, S. Le Borne, and J.-P. M. Zemke, A GPU-Parallelized Interpolation-Based Fast Multipole Method for the Relativistic Space-Charge Field Calculation, preprint [https://arxiv.org/abs/2302.07567](https://arxiv.org/abs/2302.07567)
+* Y.-K. Kan, F. X. Kärtner, S. Le Borne, and J.-P. M. Zemke, A GPU-Parallelized Interpolation-Based Fast Multipole Method for the Relativistic Space-Charge Field Calculation, _Comput. Phys. Commun._ __291__ (2023), 108825.
 
 * Y.-K. Kan, F. X. Kärtner, S. Le Borne, J.-P. M. Zemke, Relativistic Space-Charge Field Calculation by Interpolation-Based Treecode, _Comput. Phys. Commun._ __286__ (2023), 108668.
-
-* L. Wilson, N. Vaughn, and R. Krasny, A GPU-accelerated fast 
-            multipole method based on barycentric Lagrange interpolation 
-            and dual tree traversal, 
-	    _Comput. Phys. Commun._ __265__ (2021), 108017. 
-
-* L. Wang, R. Krasny, and S. Tlupova, A kernel-independent treecode 
-            based on barycentric Lagrange interpolation, 
-	    _Commun. Comput. Phys._ __28__ (2020), 1415-1436.
